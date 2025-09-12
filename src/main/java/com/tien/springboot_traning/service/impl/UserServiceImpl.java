@@ -1,26 +1,31 @@
 package com.tien.springboot_traning.service.impl;
 
 import com.tien.springboot_traning.dto.request.UserCreateRequestDTO;
+import com.tien.springboot_traning.dto.request.UserUpdateRequestDTO;
 import com.tien.springboot_traning.entity.User;
+import com.tien.springboot_traning.mapper.UserMapper;
 import com.tien.springboot_traning.repository.UserRepository;
 import com.tien.springboot_traning.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserServiceImpl implements UserService {
-    @Autowired
     private UserRepository userRepository;
+    private UserMapper userMapper;
+
     @Override
     public User createUser(UserCreateRequestDTO userCreateRequestDTO) {
-        User user = new User();
-        if(userRepository.existsByName(userCreateRequestDTO.getName())) {
+        if (userRepository.existsByName(userCreateRequestDTO.getName())) {
             throw new RuntimeException("user name existed");
         }
-        user.setName(userCreateRequestDTO.getName());
-        user.setAge(userCreateRequestDTO.getAge());
+        User user = userMapper.toUser(userCreateRequestDTO);
         return userRepository.save(user);
     }
 
@@ -36,17 +41,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(UserCreateRequestDTO userUpdateRequestDTO, int userId) {
+    public User updateUser(UserUpdateRequestDTO userUpdateRequestDTO, int userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-            user.setName(userUpdateRequestDTO.getName());
-            user.setAge(userUpdateRequestDTO.getAge());
-            return userRepository.save(user);
+        if (userRepository.existsByName(userUpdateRequestDTO.getName())) {
+            throw new RuntimeException("user name existed");
+        }
+        userMapper.toUserUpdate(userUpdateRequestDTO, user);
+        return userRepository.save(user);
     }
 
     @Override
     public User deleteUser(int userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-         userRepository.delete(user);
-         return user;
+        userRepository.delete(user);
+        return user;
     }
 }

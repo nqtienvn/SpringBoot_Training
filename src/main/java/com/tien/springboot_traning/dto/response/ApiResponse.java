@@ -1,5 +1,6 @@
-package com.tien.springboot_traning.dto.request;
+package com.tien.springboot_traning.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +11,9 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserUpdateRequestDTO {
-     String name;
-     int age;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ApiResponse<T> {
+     int code = 18;
+     String message;
+     T result;
 }
