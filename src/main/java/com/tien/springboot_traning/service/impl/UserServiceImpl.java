@@ -16,6 +16,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User createUser(UserCreateRequestDTO userCreateRequestDTO) {
         User user = new User();
+        if(userRepository.existsByName(userCreateRequestDTO.getName())) {
+            throw new RuntimeException("user name existed");
+        }
         user.setName(userCreateRequestDTO.getName());
         user.setAge(userCreateRequestDTO.getAge());
         return userRepository.save(user);

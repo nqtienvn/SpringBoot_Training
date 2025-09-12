@@ -3,6 +3,7 @@ package com.tien.springboot_traning.controller;
 import com.tien.springboot_traning.dto.request.UserCreateRequestDTO;
 import com.tien.springboot_traning.entity.User;
 import com.tien.springboot_traning.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +19,7 @@ public class HelloSpringController {
     }
 
     @PostMapping("/users")
-    public User createUser(@RequestBody UserCreateRequestDTO userCreateRequestDTO) {
+    public User createUser(@RequestBody @Valid UserCreateRequestDTO userCreateRequestDTO) {
         return userService.createUser(userCreateRequestDTO);
     }
     @GetMapping("/users")
