@@ -1,7 +1,10 @@
 package com.tien.springboot_traning.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Entity
@@ -18,4 +21,6 @@ public class User {
      String name;
     @Column(name = "Age")
      int age;
+    @Column(name = "Password")
+    String password;
 }

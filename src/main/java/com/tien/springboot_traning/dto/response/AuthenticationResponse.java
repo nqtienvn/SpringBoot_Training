@@ -1,4 +1,4 @@
-package com.tien.springboot_traning.dto.request;
+package com.tien.springboot_traning.dto.response;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -7,11 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserUpdateRequestDTO {
-     String name;
-     int age;
-     String password;
+public class AuthenticationResponse {
+    boolean isAuthenticated;
 }

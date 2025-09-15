@@ -10,8 +10,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserUpdateRequestDTO {
-     String name;
-     int age;
-     String password;
+public class AuthenticationRequest {
+    String name;
+    String password;
 }

@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class HelloSpringController {
-    private UserService userService;
+     UserService userService;
 
     @GetMapping("/hello")
     public String sayHello() {

@@ -17,4 +17,5 @@ public class UserCreateRequestDTO {
      String name;
     @Min(value = 1, message = "age can not < 1")
      int age;
+    String password;
 }

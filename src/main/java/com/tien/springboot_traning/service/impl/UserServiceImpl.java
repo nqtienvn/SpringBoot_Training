@@ -9,6 +9,8 @@ import com.tien.springboot_traning.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,8 +19,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserServiceImpl implements UserService {
-    private UserRepository userRepository;
-    private UserMapper userMapper;
+     UserRepository userRepository;
+     UserMapper userMapper;
 
     @Override
     public User createUser(UserCreateRequestDTO userCreateRequestDTO) {
@@ -26,6 +28,8 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("user name existed");
         }
         User user = userMapper.toUser(userCreateRequestDTO);
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        user.setPassword(passwordEncoder.encode(userCreateRequestDTO.getPassword()));
         return userRepository.save(user);
     }
 
@@ -47,6 +51,8 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("user name existed");
         }
         userMapper.toUserUpdate(userUpdateRequestDTO, user);
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        user.setPassword(passwordEncoder.encode(userUpdateRequestDTO.getPassword()));
         return userRepository.save(user);
     }
 
