@@ -8,7 +8,7 @@ public class AppException extends RuntimeException{
     ErrorCode errorcode;
 
     public AppException(ErrorCode errorcode) {
-        super(errorcode.getMessage());
+//        super(errorcode.getMessage());
         this.errorcode = errorcode;
     }
 
