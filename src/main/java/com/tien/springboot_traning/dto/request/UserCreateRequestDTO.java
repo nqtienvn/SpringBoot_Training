@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 public class UserCreateRequestDTO {
     @Size(min = 3, message = "USERNAME_AT_LEST_3")
     private String name;
-    @Min(value = 1, message = "age can not < 1")
+    @Min(value = 1, message = "AGE_ERROR")
     private int age;
 
     public String getName() {
