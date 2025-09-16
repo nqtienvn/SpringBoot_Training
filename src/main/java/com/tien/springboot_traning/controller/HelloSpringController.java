@@ -1,6 +1,8 @@
 package com.tien.springboot_traning.controller;
 
 import com.tien.springboot_traning.dto.request.UserCreateRequestDTO;
+import com.tien.springboot_traning.dto.response.ApiResponse;
+import com.tien.springboot_traning.dto.response.UserResponseDTO;
 import com.tien.springboot_traning.entity.User;
 import com.tien.springboot_traning.service.UserService;
 import jakarta.validation.Valid;
@@ -19,23 +21,43 @@ public class HelloSpringController {
     }
 
     @PostMapping("/users")
-    public User createUser(@RequestBody @Valid UserCreateRequestDTO userCreateRequestDTO) {
-        return userService.createUser(userCreateRequestDTO);
+    public ApiResponse<UserResponseDTO> createUser(@RequestBody @Valid UserCreateRequestDTO userCreateRequestDTO) {
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setMessage("Tạo thành công user");
+        apiResponse.setCode(200);
+        apiResponse.setResult(userService.createUser(userCreateRequestDTO));
+        return apiResponse;
     }
     @GetMapping("/users")
-    public List<User> UsersInformation() {
-        return userService.usersInformation();
+    public ApiResponse<List<UserResponseDTO>> UsersInformation() {
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setMessage("Lấy thành công list users");
+        apiResponse.setCode(200);
+        apiResponse.setResult(userService.usersInformation());
+        return apiResponse;
     }
     @GetMapping("/users/{userId}")
-    public User findById(@PathVariable("userId") int userId) {
-        return userService.findUserById(userId);
+    public ApiResponse<UserResponseDTO> findById(@PathVariable("userId") int userId) {
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setMessage("Tìm thành công user");
+        apiResponse.setCode(200);
+        apiResponse.setResult(userService.findUserById(userId));
+        return apiResponse;
     }
     @PutMapping("/users/{userId}")
-    public User updateUser(@RequestBody UserCreateRequestDTO userUpdateRequestDTO, @PathVariable("userId") int userId) {
-        return userService.updateUser(userUpdateRequestDTO, userId);
+    public ApiResponse<UserResponseDTO> updateUser(@RequestBody UserCreateRequestDTO userUpdateRequestDTO, @PathVariable("userId") int userId) {
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setMessage("Cập nhật thành công user");
+        apiResponse.setCode(200);
+        apiResponse.setResult(userService.updateUser(userUpdateRequestDTO, userId));
+        return apiResponse;
     }
     @DeleteMapping("/users/{userId}")
-    public User deleteUser(@PathVariable("userId") int userId) {
-        return userService.deleteUser(userId);
+    public ApiResponse<UserResponseDTO> deleteUser(@PathVariable("userId") int userId) {
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setMessage("Xóa thành công user");
+        apiResponse.setCode(200);
+        apiResponse.setResult(userService.deleteUser(userId));
+        return apiResponse;
     }
 }
