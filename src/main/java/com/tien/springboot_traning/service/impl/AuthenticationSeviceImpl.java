@@ -33,7 +33,7 @@ import java.util.Date;
 public class AuthenticationSeviceImpl implements AuthenticationService {
     UserRepository userRepository;
     @NonFinal
-    protected static final String SIGN_KEY = "6Ta61TEI2W5QeAuXkCfeKgzwQpfc1ySysqd0xH6Ey6W7eofgJ97pSsUqeocaqlmD";//tránh inject vào constructor
+        protected static final String SIGN_KEY = "6Ta61TEI2W5QeAuXkCfeKgzwQpfc1ySysqd0xH6Ey6W7eofgJ97pSsUqeocaqlmD";//tránh inject vào constructor
     @Override
     public AuthenticationResponse checkLogin(AuthenticationRequest authenticationRequest) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
@@ -54,17 +54,24 @@ public class AuthenticationSeviceImpl implements AuthenticationService {
     @Override
     public boolean introspect(IntrospectRequest introspectRequest) throws JOSEException, ParseException {
         var token = introspectRequest.getToken();
-        JWSVerifier verifier = new MACVerifier(SIGN_KEY.getBytes(StandardCharsets.UTF_8));
+
         SignedJWT signedJWT = SignedJWT.parse(token); //trả về kiểu object để dễ thao tác
         Date expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+        JWSVerifier verifier = new MACVerifier(SIGN_KEY.getBytes(StandardCharsets.UTF_8));
         var verified = signedJWT.verify(verifier);
+
+
         return IntrospectResponse.builder()
                 .valid(verified && expiryTime.after(new Date()))
                         .build().isValid();
     }
 
     public String generateToken(String name) {
+        // headaer
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
+
+        //Payload
         //data trong token
         JWTClaimsSet jwsClaimSet = new JWTClaimsSet.Builder()
                 .subject(name)
@@ -77,10 +84,13 @@ public class AuthenticationSeviceImpl implements AuthenticationService {
                 .claim("userId", "custom")
                 .build();
         Payload payload = new Payload(jwsClaimSet.toJSONObject());
+
        //tạo token
         JWSObject jwsObject = new JWSObject(header, payload);
         try {
-            jwsObject.sign(new MACSigner(SIGN_KEY.getBytes(StandardCharsets.UTF_8)));  //cần một salt 32 bytes
+            jwsObject.sign(new MACSigner(SIGN_KEY.getBytes(StandardCharsets.UTF_8)));
+
+            //cần một salt 32 bytes
             return jwsObject.serialize();
         } catch (JOSEException e) {
             throw new RuntimeException("Cannot create token");
