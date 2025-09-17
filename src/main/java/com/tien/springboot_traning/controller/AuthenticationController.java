@@ -7,6 +7,7 @@ import com.tien.springboot_traning.dto.response.ApiResponse;
 import com.tien.springboot_traning.dto.response.AuthenticationResponse;
 import com.tien.springboot_traning.dto.response.IntrospectResponse;
 import com.tien.springboot_traning.service.AuthenticationService;
+import com.tien.springboot_traning.service.JwtService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,9 +24,10 @@ import java.text.ParseException;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationController {
     AuthenticationService authenticationSevice;
+    JwtService jwtService;
     @PostMapping("/token")
     public ApiResponse<AuthenticationResponse> login(@RequestBody AuthenticationRequest authenticationRequest) {
-        AuthenticationResponse authenticationResponse = authenticationSevice.checkLogin(authenticationRequest);
+        AuthenticationResponse authenticationResponse = jwtService.checkLogin(authenticationRequest);
         ApiResponse<AuthenticationResponse> apiResponse =  ApiResponse.<AuthenticationResponse>builder()
                 .code(200)
                 .message("đăng nhập thành công")
@@ -36,11 +38,11 @@ public class AuthenticationController {
     @PostMapping("/introspect")
     public ApiResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest introspectRequest) throws ParseException, JOSEException {
        IntrospectResponse instrospectResponse = IntrospectResponse.builder()
-               .valid(authenticationSevice.introspect(introspectRequest))
+               .valid(jwtService.verifyToken(introspectRequest))
                .build();
         ApiResponse<IntrospectResponse> apiResponse =  ApiResponse.<IntrospectResponse>builder()
                 .code(200)
-                .message("")
+                .message("Verify token oke, welcome")
                 .result(instrospectResponse)
                 .build();
         return apiResponse;

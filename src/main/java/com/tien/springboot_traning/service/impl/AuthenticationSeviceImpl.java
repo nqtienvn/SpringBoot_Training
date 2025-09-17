@@ -54,14 +54,16 @@ public class AuthenticationSeviceImpl implements AuthenticationService {
     @Override
     public boolean introspect(IntrospectRequest introspectRequest) throws JOSEException, ParseException {
         var token = introspectRequest.getToken();
-
+        //signedJWT sẽ parse lại token thành kiểu object có các thuộc tính như là: header, payload, signnature
         SignedJWT signedJWT = SignedJWT.parse(token); //trả về kiểu object để dễ thao tác
+
         Date expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
-
+        //đây là khời tạo đối tượng với key
         JWSVerifier verifier = new MACVerifier(SIGN_KEY.getBytes(StandardCharsets.UTF_8));
+        //cái veryfied này được thực hiện như sau
+        //ở đối tượng signedJWT nó sẽ lấy được về 3 thuộc tính và sẽ tính lại token bằng header, pay load , key trong verifier
+        //và nó sẽ so sánh luôn với cái signed cũ trong signedJWT và trả về true hoặc false
         var verified = signedJWT.verify(verifier);
-
-
         return IntrospectResponse.builder()
                 .valid(verified && expiryTime.after(new Date()))
                         .build().isValid();
@@ -69,6 +71,8 @@ public class AuthenticationSeviceImpl implements AuthenticationService {
 
     public String generateToken(String name) {
         // headaer
+        //nợi định nghĩa gửi về loại token gì
+        //nơi định nghĩa thuật toán để tạo ra signature, k phỉa thuật toán tọa token(header.payload.signature)
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         //Payload
@@ -81,7 +85,7 @@ public class AuthenticationSeviceImpl implements AuthenticationService {
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
                 ))
                 //custom claim
-                .claim("userId", "custom")
+                .claim("role", "[admin, user]")
                 .build();
         Payload payload = new Payload(jwsClaimSet.toJSONObject());
 
