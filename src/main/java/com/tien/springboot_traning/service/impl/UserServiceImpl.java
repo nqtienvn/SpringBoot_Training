@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse createUser(UserCreateRequestDTO userCreateRequestDTO) {
         if (userRepository.existsByName(userCreateRequestDTO.getName())) {
-            throw new RuntimeException("user name existed");
+            throw new AppException(ErrorCode.USER_NOT_EXTSTED);
         }
         User user = userMapper.toUser(userCreateRequestDTO);
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
@@ -68,16 +68,16 @@ public class UserServiceImpl implements UserService {
     public UserResponse findUserById(int userId) {
         log.info("chạy");
         return userMapper.toUserResponse(userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found")));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXTSTED)));
     }
 
     @Override
     @PostAuthorize("returnObject.name == authentication.name")
     //chir co no moi duoc update no
     public UserResponse updateUser(UserUpdateRequestDTO userUpdateRequestDTO, int userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXTSTED));
         if (userRepository.existsByName(userUpdateRequestDTO.getName())) {
-            throw new RuntimeException("user name existed");
+            throw new AppException(ErrorCode.NAME_EXIST);
         }
         userMapper.toUserUpdate(userUpdateRequestDTO, user);
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
@@ -88,7 +88,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     public UserResponse deleteUser(int userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXTSTED));
         userRepository.delete(user);
         return userMapper.toUserResponse(user);
     }

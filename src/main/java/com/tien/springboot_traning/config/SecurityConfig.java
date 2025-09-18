@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .authenticated());
 
         httpSecurity.oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter())));
+                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter()))/*.authenticationEntryPoint(new JwtAuthenticationEntryPoint())*/);
         //csrf chỉ dùng cho session và cookie còn lại thì k cần nên với jwt thì sẽ tắt đi
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         return httpSecurity.build();
