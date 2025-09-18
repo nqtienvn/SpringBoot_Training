@@ -44,6 +44,16 @@ public class HelloSpringController {
         apiResponse.setResult(userService.findUserById(userId));
         return apiResponse;
     }
+    //vào trang cá nhân sau khi đăng nhập
+    @GetMapping("/users/myInfo")
+    public ApiResponse<UserResponse> getMyInfo() {
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setCode(200);
+        apiResponse.setMessage("success");
+        apiResponse.setResult(userService.getMyInfo());
+        return apiResponse;
+    }
+
     @PutMapping("/users/{userId}")
     public ApiResponse<UserResponse> updateUser(@RequestBody UserUpdateRequestDTO userUpdateRequestDTO, @PathVariable("userId") int userId) {
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();

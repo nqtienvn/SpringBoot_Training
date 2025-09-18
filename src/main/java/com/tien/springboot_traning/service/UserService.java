@@ -17,4 +17,5 @@ public interface UserService {
     UserResponse updateUser(UserUpdateRequestDTO userUpdateRequestDTO, int userId);
 
     UserResponse deleteUser(int userId);
+    UserResponse getMyInfo();
 }

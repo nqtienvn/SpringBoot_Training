@@ -5,6 +5,8 @@ import com.tien.springboot_traning.dto.request.UserUpdateRequestDTO;
 import com.tien.springboot_traning.dto.response.UserResponse;
 import com.tien.springboot_traning.entity.User;
 import com.tien.springboot_traning.enums.Roles;
+import com.tien.springboot_traning.exception.AppException;
+import com.tien.springboot_traning.exception.ErrorCode;
 import com.tien.springboot_traning.mapper.UserMapper;
 import com.tien.springboot_traning.repository.UserRepository;
 import com.tien.springboot_traning.service.UserService;
@@ -12,6 +14,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,7 +32,6 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
      UserRepository userRepository;
      UserMapper userMapper;
-
     @Override
     public UserResponse createUser(UserCreateRequestDTO userCreateRequestDTO) {
         if (userRepository.existsByName(userCreateRequestDTO.getName())) {
@@ -44,9 +47,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    //chạy nếu là admin
     public List<UserResponse> usersInformation() {
         var authorization =  SecurityContextHolder.getContext().getAuthentication();
         log.info(authorization.getName());
+        log.info("chạy");
         //granted là kết quả của cơ chế của Oauth2 resouce server map từ jwt sang security để lấy về scope
         authorization.getAuthorities().forEach(granted -> log.info(granted.getAuthority()));
         List<User> users = userRepository.findAll();
@@ -56,12 +62,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    //id của chính mình thì mình mới được lấy nếu không phải là ad min
+    //còn nếu là admin thì được lấy tất
+    @PostAuthorize("returnObject.name == authentication.name or hasRole('ADMIN')")
     public UserResponse findUserById(int userId) {
+        log.info("chạy");
         return userMapper.toUserResponse(userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found")));
     }
 
     @Override
+    @PostAuthorize("returnObject.name == authentication.name")
+    //chir co no moi duoc update no
     public UserResponse updateUser(UserUpdateRequestDTO userUpdateRequestDTO, int userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         if (userRepository.existsByName(userUpdateRequestDTO.getName())) {
@@ -74,9 +86,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse deleteUser(int userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         userRepository.delete(user);
+        return userMapper.toUserResponse(user);
+    }
+
+    @Override
+    public UserResponse getMyInfo() {
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+        User user = userRepository.findUserByName(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXTSTED));
         return userMapper.toUserResponse(user);
     }
 }
