@@ -32,16 +32,14 @@ public class JwtServiceImpl implements JwtService {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         User user = userRepository.findUserByName(authenticationRequest.getName()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXTSTED));
         boolean authenticated = passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword());
-        if (authenticated == false) {
+        if (!authenticated) {
             throw new AppException(ErrorCode.PASS_INCORECT);
-        } else {
+        }
             var token = generateToken(authenticationRequest.getName());
-            AuthenticationResponse authenticationResponse = AuthenticationResponse.builder()
+            return AuthenticationResponse.builder()
                     .isAuthenticated(true)
                     .token(token)
                     .build();
-            return authenticationResponse;
-        }
     }
 
     public String generateToken(String username) {

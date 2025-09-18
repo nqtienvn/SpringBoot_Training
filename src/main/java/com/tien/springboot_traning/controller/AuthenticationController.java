@@ -27,7 +27,7 @@ public class AuthenticationController {
     JwtService jwtService;
     @PostMapping("/token")
     public ApiResponse<AuthenticationResponse> login(@RequestBody AuthenticationRequest authenticationRequest) {
-        AuthenticationResponse authenticationResponse = jwtService.checkLogin(authenticationRequest);
+        AuthenticationResponse authenticationResponse = authenticationSevice.checkLogin(authenticationRequest);
         ApiResponse<AuthenticationResponse> apiResponse =  ApiResponse.<AuthenticationResponse>builder()
                 .code(200)
                 .message("đăng nhập thành công")
@@ -38,7 +38,7 @@ public class AuthenticationController {
     @PostMapping("/introspect")
     public ApiResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest introspectRequest) throws ParseException, JOSEException {
        IntrospectResponse instrospectResponse = IntrospectResponse.builder()
-               .valid(jwtService.verifyToken(introspectRequest))
+               .valid(authenticationSevice.introspect(introspectRequest))
                .build();
         ApiResponse<IntrospectResponse> apiResponse =  ApiResponse.<IntrospectResponse>builder()
                 .code(200)

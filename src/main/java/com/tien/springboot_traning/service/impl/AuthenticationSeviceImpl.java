@@ -10,6 +10,7 @@ import com.tien.springboot_traning.dto.request.IntrospectRequest;
 import com.tien.springboot_traning.dto.response.AuthenticationResponse;
 import com.tien.springboot_traning.dto.response.IntrospectResponse;
 import com.tien.springboot_traning.entity.User;
+import com.tien.springboot_traning.entity.jwt.JwtProperties;
 import com.tien.springboot_traning.repository.UserRepository;
 import com.tien.springboot_traning.service.AuthenticationService;
 import lombok.AccessLevel;
@@ -20,20 +21,22 @@ import lombok.experimental.NonFinal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.Date;
+import java.util.StringJoiner;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationSeviceImpl implements AuthenticationService {
     UserRepository userRepository;
-    @NonFinal
-        protected static final String SIGN_KEY = "6Ta61TEI2W5QeAuXkCfeKgzwQpfc1ySysqd0xH6Ey6W7eofgJ97pSsUqeocaqlmD";//tránh inject vào constructor
+    JwtProperties jwtProperties;
     @Override
     public AuthenticationResponse checkLogin(AuthenticationRequest authenticationRequest) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
@@ -42,12 +45,11 @@ public class AuthenticationSeviceImpl implements AuthenticationService {
         if (authenticated == false) {
             throw new RuntimeException("Đăng nhập không thành công");
         } else {
-            var token = generateToken(authenticationRequest.getName());
-            AuthenticationResponse authenticationResponse = AuthenticationResponse.builder()
+            var token = generateToken(user);
+            return AuthenticationResponse.builder()
                     .isAuthenticated(true)
                     .token(token)
                     .build();
-            return authenticationResponse;
         }
     }
 
@@ -59,7 +61,7 @@ public class AuthenticationSeviceImpl implements AuthenticationService {
 
         Date expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
         //đây là khời tạo đối tượng với key
-        JWSVerifier verifier = new MACVerifier(SIGN_KEY.getBytes(StandardCharsets.UTF_8));
+        JWSVerifier verifier = new MACVerifier(jwtProperties.getSecret().getBytes());
         //cái veryfied này được thực hiện như sau
         //ở đối tượng signedJWT nó sẽ lấy được về 3 thuộc tính và sẽ tính lại token bằng header, pay load , key trong verifier
         //và nó sẽ so sánh luôn với cái signed cũ trong signedJWT và trả về true hoặc false
@@ -69,7 +71,7 @@ public class AuthenticationSeviceImpl implements AuthenticationService {
                         .build().isValid();
     }
 
-    public String generateToken(String name) {
+    public String generateToken(User user) {
         // headaer
         //nợi định nghĩa gửi về loại token gì
         //nơi định nghĩa thuật toán để tạo ra signature, k phỉa thuật toán tọa token(header.payload.signature)
@@ -78,26 +80,36 @@ public class AuthenticationSeviceImpl implements AuthenticationService {
         //Payload
         //data trong token
         JWTClaimsSet jwsClaimSet = new JWTClaimsSet.Builder()
-                .subject(name)
+                .subject(user.getName())
                 .issuer("tien.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
                 ))
                 //custom claim
-                .claim("role", "[admin, user]")
+                //role là set nên là ta cần chuyển set này về String
+                .claim("scope", buildScope(user))
                 .build();
         Payload payload = new Payload(jwsClaimSet.toJSONObject());
 
        //tạo token
         JWSObject jwsObject = new JWSObject(header, payload);
         try {
-            jwsObject.sign(new MACSigner(SIGN_KEY.getBytes(StandardCharsets.UTF_8)));
+            jwsObject.sign(new MACSigner(jwtProperties.getSecret().getBytes()));
 
             //cần một salt 32 bytes
             return jwsObject.serialize();
         } catch (JOSEException e) {
             throw new RuntimeException("Cannot create token");
         }
+    }
+    public String buildScope(User user) {
+        //joiner string bằng dấu cách thay cho concat thủ công hay add bằng String builder
+        StringJoiner joiner = new StringJoiner(" ");
+        if(!CollectionUtils.isEmpty(user.getRoles())) {
+            user.getRoles().forEach(joiner::add);
+            return joiner.toString();
+        }
+        return null;
     }
 }

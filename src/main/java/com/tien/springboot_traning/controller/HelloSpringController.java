@@ -3,7 +3,7 @@ package com.tien.springboot_traning.controller;
 import com.tien.springboot_traning.dto.request.UserCreateRequestDTO;
 import com.tien.springboot_traning.dto.request.UserUpdateRequestDTO;
 import com.tien.springboot_traning.dto.response.ApiResponse;
-import com.tien.springboot_traning.entity.User;
+import com.tien.springboot_traning.dto.response.UserResponse;
 import com.tien.springboot_traning.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -25,25 +25,39 @@ public class HelloSpringController {
     }
 
     @PostMapping("/users")
-    public ApiResponse<User> createUser(@RequestBody @Valid UserCreateRequestDTO userCreateRequestDTO) {
-            ApiResponse<User> apiResponse = new ApiResponse<>();
+    public ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreateRequestDTO userCreateRequestDTO) {
+            ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+            apiResponse.setCode(200);
+            apiResponse.setMessage("success");
             apiResponse.setResult(userService.createUser(userCreateRequestDTO));
             return apiResponse;
     }
     @GetMapping("/users")
-    public List<User> UsersInformation() {
+    public List<UserResponse> UsersInformation() {
         return userService.usersInformation();
     }
     @GetMapping("/users/{userId}")
-    public User findById(@PathVariable("userId") int userId) {
-        return userService.findUserById(userId);
+    public ApiResponse<UserResponse> findById(@PathVariable("userId") int userId) {
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setCode(200);
+        apiResponse.setMessage("success");
+        apiResponse.setResult(userService.findUserById(userId));
+        return apiResponse;
     }
     @PutMapping("/users/{userId}")
-    public User updateUser(@RequestBody UserUpdateRequestDTO userUpdateRequestDTO, @PathVariable("userId") int userId) {
-        return userService.updateUser(userUpdateRequestDTO, userId);
+    public ApiResponse<UserResponse> updateUser(@RequestBody UserUpdateRequestDTO userUpdateRequestDTO, @PathVariable("userId") int userId) {
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setCode(200);
+        apiResponse.setMessage("success");
+        apiResponse.setResult(userService.updateUser(userUpdateRequestDTO, userId));
+        return apiResponse;
     }
     @DeleteMapping("/users/{userId}")
-    public User deleteUser(@PathVariable("userId") int userId) {
-        return userService.deleteUser(userId);
+    public ApiResponse<UserResponse> deleteUser(@PathVariable("userId") int userId) {
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setCode(200);
+        apiResponse.setMessage("success");
+        apiResponse.setResult(userService.deleteUser(userId));
+        return apiResponse;
     }
 }
