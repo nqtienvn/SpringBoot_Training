@@ -21,13 +21,13 @@ public class GlobalExceptionHandler {
         apiResponse.setMessage(errorCode.getMessage());
         return ResponseEntity.status(errorCode.getHttpStatusCode()).body(apiResponse);
     }
-    @ExceptionHandler(value = Exception.class)
-    ResponseEntity<ApiResponse> handlingException(Exception exception) {
-        ApiResponse apiResponse = new ApiResponse();
-        apiResponse.setCode(ErrorCode.UNKNOW_ERROR.getCode());
-        apiResponse.setMessage(ErrorCode.UNKNOW_ERROR.getMessage());
-        return ResponseEntity.status(ErrorCode.UNKNOW_ERROR.getHttpStatusCode()).body(apiResponse);
-    }
+//    @ExceptionHandler(value = Exception.class)
+//    ResponseEntity<ApiResponse> handlingException(Exception exception) {
+//        ApiResponse apiResponse = new ApiResponse();
+//        apiResponse.setCode(ErrorCode.UNKNOW_ERROR.getCode());
+//        apiResponse.setMessage(ErrorCode.UNKNOW_ERROR.getMessage());
+//        return ResponseEntity.status(ErrorCode.UNKNOW_ERROR.getHttpStatusCode()).body(apiResponse);
+//    }
     @ExceptionHandler(value = AccessDeniedException.class)
     ResponseEntity<ApiResponse> handlingAccessException(AccessDeniedException accessException) {
         ApiResponse apiResponse = new ApiResponse();

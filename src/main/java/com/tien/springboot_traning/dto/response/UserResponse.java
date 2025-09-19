@@ -1,6 +1,7 @@
 package com.tien.springboot_traning.dto.response;
 
 
+import com.tien.springboot_traning.entity.Role;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,5 +17,5 @@ public class UserResponse {
     int id;
     String name;
     int age;
-    Set<String> roles;
+    Set<Role> roles;
 }

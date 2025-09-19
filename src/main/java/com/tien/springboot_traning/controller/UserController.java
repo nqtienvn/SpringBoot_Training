@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class HelloSpringController {
+public class UserController {
      UserService userService;
 
     @GetMapping("/hello")
@@ -25,7 +25,7 @@ public class HelloSpringController {
     }
 
     @PostMapping("/users")
-    public ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreateRequestDTO userCreateRequestDTO) {
+    public ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreateRequestDTO userCreateRequestDTO) throws Exception {
             ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
             apiResponse.setCode(200);
             apiResponse.setMessage("success");

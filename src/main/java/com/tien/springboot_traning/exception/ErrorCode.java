@@ -17,7 +17,9 @@ public enum ErrorCode {
     UNKNOW_ERROR(1234, "lỗi lạ", HttpStatus.INTERNAL_SERVER_ERROR), //500
     NAME_EXIST(113, "tên đã tồn tại", HttpStatus.BAD_REQUEST),
     ACESS_DENIDED(115, "không có quyền truy cập", HttpStatus.FORBIDDEN),
-    UNAUTHENTICATED(401, "không xác minh được", HttpStatus.UNAUTHORIZED);
+    UNAUTHENTICATED(401, "không xác minh được", HttpStatus.UNAUTHORIZED),
+    EMPTY(9, "trong database không có dữ liệu", HttpStatus.NOT_FOUND)
+    ;
     int code;
     String message;
     HttpStatusCode httpStatusCode;

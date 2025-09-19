@@ -3,11 +3,13 @@ package com.tien.springboot_traning.service.impl;
 import com.tien.springboot_traning.dto.request.UserCreateRequestDTO;
 import com.tien.springboot_traning.dto.request.UserUpdateRequestDTO;
 import com.tien.springboot_traning.dto.response.UserResponse;
+import com.tien.springboot_traning.entity.Role;
 import com.tien.springboot_traning.entity.User;
 import com.tien.springboot_traning.enums.Roles;
 import com.tien.springboot_traning.exception.AppException;
 import com.tien.springboot_traning.exception.ErrorCode;
 import com.tien.springboot_traning.mapper.UserMapper;
+import com.tien.springboot_traning.repository.RoleRepository;
 import com.tien.springboot_traning.repository.UserRepository;
 import com.tien.springboot_traning.service.UserService;
 import lombok.AccessLevel;
@@ -32,16 +34,22 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
      UserRepository userRepository;
      UserMapper userMapper;
+     RoleRepository roleRepository;
     @Override
-    public UserResponse createUser(UserCreateRequestDTO userCreateRequestDTO) {
+    public UserResponse createUser(UserCreateRequestDTO userCreateRequestDTO) throws Exception {
         if (userRepository.existsByName(userCreateRequestDTO.getName())) {
             throw new AppException(ErrorCode.USER_NOT_EXTSTED);
         }
         User user = userMapper.toUser(userCreateRequestDTO);
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         user.setPassword(passwordEncoder.encode(userCreateRequestDTO.getPassword()));
-        HashSet<String> roles = new HashSet<>();
-        roles.add(Roles.USER.name());
+        HashSet<Role> roles = new HashSet<>();
+        if(roleRepository.findById(Roles.USER.name()).isEmpty()) {
+            roles.add(roleRepository.save(Role.builder().name(Roles.USER.name()).build()));
+        }
+        else {
+            roles.add(roleRepository.findById(Roles.USER.name()).orElseThrow(Exception::new));
+        }
         user.setRoles(roles);
         return userMapper.toUserResponse(userRepository.save(user));
     }

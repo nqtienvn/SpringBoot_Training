@@ -8,7 +8,7 @@ import com.tien.springboot_traning.entity.User;
 import java.util.List;
 
 public interface UserService {
-    UserResponse createUser(UserCreateRequestDTO userCreateRequestDTO);
+    UserResponse createUser(UserCreateRequestDTO userCreateRequestDTO) throws Exception;
 
     List<UserResponse> usersInformation();
 

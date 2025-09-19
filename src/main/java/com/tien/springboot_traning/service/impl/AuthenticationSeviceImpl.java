@@ -11,6 +11,8 @@ import com.tien.springboot_traning.dto.response.AuthenticationResponse;
 import com.tien.springboot_traning.dto.response.IntrospectResponse;
 import com.tien.springboot_traning.entity.User;
 import com.tien.springboot_traning.entity.jwt.JwtProperties;
+import com.tien.springboot_traning.exception.AppException;
+import com.tien.springboot_traning.exception.ErrorCode;
 import com.tien.springboot_traning.repository.UserRepository;
 import com.tien.springboot_traning.service.AuthenticationService;
 import lombok.AccessLevel;
@@ -40,10 +42,10 @@ public class AuthenticationSeviceImpl implements AuthenticationService {
     @Override
     public AuthenticationResponse checkLogin(AuthenticationRequest authenticationRequest) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        User user = userRepository.findUserByName(authenticationRequest.getName()).orElseThrow(() -> new RuntimeException("Không tìm thấy tài khoản cần đăng nhập"));
+        User user = userRepository.findUserByName(authenticationRequest.getName()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXTSTED));
         boolean authenticated = passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword());
-        if (authenticated == false) {
-            throw new RuntimeException("Đăng nhập không thành công");
+        if (!authenticated) {
+            throw new AppException(ErrorCode.PASS_INCORECT);
         } else {
             var token = generateToken(user);
             return AuthenticationResponse.builder()
@@ -100,14 +102,14 @@ public class AuthenticationSeviceImpl implements AuthenticationService {
             //cần một salt 32 bytes
             return jwsObject.serialize();
         } catch (JOSEException e) {
-            throw new RuntimeException("Cannot create token");
+            throw new AppException(ErrorCode.ERROR_TOKEN);
         }
     }
     public String buildScope(User user) {
         //joiner string bằng dấu cách thay cho concat thủ công hay add bằng String builder
         StringJoiner joiner = new StringJoiner(" ");
         if(!CollectionUtils.isEmpty(user.getRoles())) {
-            user.getRoles().forEach(joiner::add);
+            user.getRoles().forEach(role ->  joiner.add(role.getName()));
             return joiner.toString();
         }
         return null;

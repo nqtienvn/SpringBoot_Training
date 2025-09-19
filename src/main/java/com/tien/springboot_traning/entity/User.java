@@ -23,5 +23,6 @@ public class User {
      int age;
     @Column(name = "Password")
     String password;
-    Set<String> roles;
+    @ManyToMany
+    Set<Role> roles;
 }
