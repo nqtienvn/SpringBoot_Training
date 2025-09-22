@@ -16,6 +16,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,10 +48,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('USER')")
     //chạy nếu là admin
     public List<UserResponse> usersInformation() {
-        var authorization =  SecurityContextHolder.getContext().getAuthentication();
+        Authentication authorization =  SecurityContextHolder.getContext().getAuthentication();
         log.info(authorization.getName());
         log.info("chạy");
         //granted là kết quả của cơ chế của Oauth2 resouce server map từ jwt sang security để lấy về scope
